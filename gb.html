@@ -1,80 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR GLB Viewer</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-    }
-
-    canvas {
-      display: block;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/webxr/ARButton.js"></script>
+    <title>Single Dice</title>
+    <meta name="description" content="Single Polyhedral Dice">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+    <script src="js/aframe-v1.3.0.js"></script>
 </head>
 
 <body>
-  <script>
-    let scene, camera, renderer, controller;
 
-    init();
+<script>
+AFRAME.registerComponent("single-dice", {
 
-    function init() {
-      // Create a basic Three.js scene
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.xr.enabled = true;
-      document.body.appendChild(renderer.domElement);
+    schema: {},
 
-      // Add AR Button for WebXR
-      document.body.appendChild(THREE.ARButton.createButton(renderer));
+    init: function () {        
+        // Load the single dice model
+        const loader = new THREE.GLTFLoader();
 
-      // Add light to the scene
-      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-      light.position.set(0.5, 1, 0.25);
-      scene.add(light);
+        const callbackFunction = (model) => {
+            const mesh = model.scene.children[0];
+            mesh.scale.set(0.3, 0.3, 0.3); // Scale down the dice
+            mesh.position.set(0, 0, 0); // Position the dice in the center
+            this.el.object3D.add(mesh);
+        };
 
-      // Load the GLB model
-      const loader = new THREE.GLTFLoader();
-      loader.load('models/dice/d20.glb', function (gltf) {
-        const model = gltf.scene;
-        model.scale.set(0.1, 0.1, 0.1); // Scale the model to fit AR
-        model.position.set(0, 0, -1); // Place the model in front of the user
-        scene.add(model);
-      });
-
-      // Add controller for interaction
-      controller = renderer.xr.getController(0);
-      scene.add(controller);
-
-      // Handle resize events
-      window.addEventListener('resize', onWindowResize, false);
-
-      // Render loop
-      renderer.setAnimationLoop(render);
+        loader.load("models/dice/d20.glb", callbackFunction);
     }
+});
+</script>
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+<a-scene background="color: #000000;">
 
-    function render() {
-      renderer.render(scene, camera);
-    }
-  </script>
+    <!-- Camera -->
+    <a-entity camera look-controls wasd-controls="acceleration: 5" position="0 1.6 0">
+        <a-entity light="type: point; color: #ffffff; distance: 20;"></a-entity>
+    </a-entity>  
+
+    <!-- Single Dice Component -->
+    <a-entity single-dice position="0 1.6 -1.7"></a-entity>
+
+</a-scene>
+
 </body>
-
 </html>
