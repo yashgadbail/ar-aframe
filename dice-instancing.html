@@ -6,7 +6,6 @@
        <meta name="description" content="Polyhedral Dice">
        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
        <script src="js/aframe-v1.3.0.js"></script>
-       <script src="js/aframe-environment-component.js"></script>
 </head>
 
 <body>
@@ -244,7 +243,7 @@ AFRAME.registerComponent("dice-instances", {
 
 </script>
 
-<a-scene environment="preset: starry; ground: none;" background="color: #000000;">
+<a-scene background="color: #000000;">
 
   <a-entity camera look-controls wasd-controls="acceleration: 5" position="0 1.6 0">
       <a-entity light="type: point; color: #888888; distance: 20;"></a-entity>
