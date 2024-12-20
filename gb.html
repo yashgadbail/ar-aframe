@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR GLB Viewer</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.155.0/examples/js/webxr/ARButton.js"></script>
+</head>
+
+<body>
+  <script>
+    let scene, camera, renderer, controller;
+
+    init();
+
+    function init() {
+      // Create a basic Three.js scene
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.xr.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      // Add AR Button for WebXR
+      document.body.appendChild(THREE.ARButton.createButton(renderer));
+
+      // Add light to the scene
+      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      light.position.set(0.5, 1, 0.25);
+      scene.add(light);
+
+      // Load the GLB model
+      const loader = new THREE.GLTFLoader();
+      loader.load('models/dice/d20.glb', function (gltf) {
+        const model = gltf.scene;
+        model.scale.set(0.1, 0.1, 0.1); // Scale the model to fit AR
+        model.position.set(0, 0, -1); // Place the model in front of the user
+        scene.add(model);
+      });
+
+      // Add controller for interaction
+      controller = renderer.xr.getController(0);
+      scene.add(controller);
+
+      // Handle resize events
+      window.addEventListener('resize', onWindowResize, false);
+
+      // Render loop
+      renderer.setAnimationLoop(render);
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+    }
+  </script>
+</body>
+
+</html>
